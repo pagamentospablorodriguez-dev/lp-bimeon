@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { supabase } from './supabaseClient';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -224,6 +225,35 @@ function App() {
   const [activeSearch, setActiveSearch] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
   const [statsVisible, setStatsVisible] = useState(false);
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formData, setFormData] = useState({ email: '', organization: '', industry: 'Education' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('submitting');
+    try {
+      const { error } = await supabase.from('demo_requests').insert({
+        email: formData.email,
+        organization: formData.organization,
+        industry: formData.industry,
+      });
+      if (error) throw error;
+      setFormStatus('success');
+    } catch {
+      setFormStatus('error');
+    }
+  };
+
+  const openModal = () => {
+    setFormStatus('idle');
+    setFormData({ email: '', organization: '', industry: 'Education' });
+    setDemoOpen(true);
+  };
+
+  const closeModal = () => {
+    setDemoOpen(false);
+    setTimeout(() => setFormStatus('idle'), 300);
+  };
   const parallax = useParallax(0.15);
   const scrollProgress = useScrollProgress();
 
@@ -285,7 +315,7 @@ function App() {
         </nav>
         <div className="nav-actions">
           <button className="text-button" onClick={() => scrollTo('contact')}>Contact</button>
-          <button className="outline-button" onClick={() => setDemoOpen(true)}>Book a demo <ArrowRight size={15} /></button>
+          <button className="outline-button" onClick={openModal}>Book a demo <ArrowRight size={15} /></button>
           <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
             {menuOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
@@ -317,8 +347,8 @@ function App() {
             </Reveal>
             <Reveal delay={300}>
               <div className="hero-actions">
-                <button className="primary-button" onClick={() => setDemoOpen(true)}>Book a demo <ArrowRight size={16} /></button>
-                <button className="play-button" onClick={() => setDemoOpen(true)}><span className="play-icon"><Play size={13} fill="currentColor" /></span> Watch platform overview</button>
+                <button className="primary-button" onClick={openModal}>Book a demo <ArrowRight size={16} /></button>
+                <button className="play-button" onClick={openModal}><span className="play-icon"><Play size={13} fill="currentColor" /></span> Watch platform overview</button>
               </div>
             </Reveal>
             <Reveal delay={400}>
@@ -642,7 +672,7 @@ function App() {
             <Reveal>
               <div className="pf-card pf-large">
                 <div className="pf-img"><img src="https://images.pexels.com/photos/29866272/pexels-photo-29866272.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Security camera" /></div>
-                <div className="pf-content"><div className="pf-tag">RECOGNITION</div><h3>Real-time facial recognition</h3><p>Enroll authorized, restricted and flagged individuals. Bimeon identifies them across every camera, in real time.</p><button className="inline-link" onClick={() => setDemoOpen(true)}>Learn more <ArrowRight size={15} /></button></div>
+                <div className="pf-content"><div className="pf-tag">RECOGNITION</div><h3>Real-time facial recognition</h3><p>Enroll authorized, restricted and flagged individuals. Bimeon identifies them across every camera, in real time.</p><button className="inline-link" onClick={openModal}>Learn more <ArrowRight size={15} /></button></div>
               </div>
             </Reveal>
             <Reveal delay={100}>
@@ -694,7 +724,7 @@ function App() {
           <div className="industry-grid">
             {industries.map(({ name, icon: Icon, text, img }, i) => (
               <Reveal key={name} delay={(i % 3) * 80}>
-                <button className="industry-card" onClick={() => setDemoOpen(true)}>
+                <button className="industry-card" onClick={openModal}>
                   <div className="industry-img"><img src={img} alt={name} /><div className="industry-overlay" /></div>
                   <div className="industry-body">
                     <Icon size={22} strokeWidth={1.5} />
@@ -739,7 +769,7 @@ function App() {
               <div className="benefits-left">
                 <h2>Why organizations<br /><span>choose Bimeon.</span></h2>
                 <p>Security is not a feature. It is the foundation. Bimeon is built for the standards critical environments demand.</p>
-                <button className="outline-button" onClick={() => setDemoOpen(true)}>Book a demo <ArrowRight size={15} /></button>
+                <button className="outline-button" onClick={openModal}>Book a demo <ArrowRight size={15} /></button>
               </div>
               <div className="benefits-list">
                 {benefits.map((b, i) => (
@@ -808,7 +838,7 @@ function App() {
               <div className="section-kicker">A CLEARER WAY FORWARD</div>
               <h2>Protect what<br /><span>matters most.</span></h2>
               <p>See what Bimeon can do for your organization.</p>
-              <button className="primary-button" onClick={() => setDemoOpen(true)}>Book a demo <ArrowRight size={16} /></button>
+              <button className="primary-button" onClick={openModal}>Book a demo <ArrowRight size={16} /></button>
             </Reveal>
           </div>
         </section>
@@ -823,7 +853,7 @@ function App() {
           </div>
           <div className="footer-links">
             <div><b>Explore</b><button onClick={() => scrollTo('platform')}>Platform</button><button onClick={() => scrollTo('industries')}>Industries</button><button onClick={() => scrollTo('capabilities')}>Capabilities</button><button onClick={() => scrollTo('roadmap')}>Roadmap</button><button onClick={() => scrollTo('security')}>Security</button></div>
-            <div><b>Company</b><button onClick={() => scrollTo('contact')}>Contact</button><button onClick={() => setDemoOpen(true)}>Request a demo</button><button>Privacy Policy</button><button>Terms</button></div>
+            <div><b>Company</b><button onClick={() => scrollTo('contact')}>Contact</button><button onClick={openModal}>Request a demo</button><button>Privacy Policy</button><button>Terms</button></div>
           </div>
         </div>
         <div className="footer-bottom">
@@ -834,19 +864,67 @@ function App() {
 
       {/* ========== DEMO MODAL ========== */}
       {demoOpen && (
-        <div className="modal-backdrop" onClick={() => setDemoOpen(false)}>
+        <div className="modal-backdrop" onClick={closeModal}>
           <div className="demo-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setDemoOpen(false)}><X size={18} /></button>
-            <div className="section-kicker">START A CONVERSATION</div>
-            <h2>See Bimeon<br /><span>in your environment.</span></h2>
-            <p>Tell us a little about your operation and our team will be in touch.</p>
-            <form onSubmit={(e) => { e.preventDefault(); setDemoOpen(false); }}>
-              <label>Work email<input type="email" placeholder="you@organization.com" required /></label>
-              <label>Organization<input type="text" placeholder="Organization name" required /></label>
-              <label>Industry<select className="enroll-select-wide"><option>Education</option><option>Healthcare</option><option>Airports</option><option>Government</option><option>Manufacturing</option><option>Stadiums</option><option>Other</option></select></label>
-              <button className="primary-button" type="submit">Request a demo <ArrowRight size={16} /></button>
-            </form>
-            <small>By submitting, you agree to be contacted by Bimeon.</small>
+            <button className="modal-close" onClick={closeModal}><X size={18} /></button>
+
+            {formStatus === 'success' ? (
+              <div className="demo-success">
+                <div className="success-icon"><Check size={36} /></div>
+                <h2>Request received.</h2>
+                <p>Thank you. Our team will be in touch within one business day to schedule your demo.</p>
+                <button className="primary-button" onClick={closeModal}>Done</button>
+              </div>
+            ) : (
+              <>
+                <div className="section-kicker">START A CONVERSATION</div>
+                <h2>See Bimeon<br /><span>in your environment.</span></h2>
+                <p>Tell us a little about your operation and our team will be in touch.</p>
+                <form onSubmit={handleSubmit}>
+                  <label>Work email
+                    <input
+                      type="email"
+                      placeholder="you@organization.com"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </label>
+                  <label>Organization
+                    <input
+                      type="text"
+                      placeholder="Organization name"
+                      required
+                      value={formData.organization}
+                      onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+                    />
+                  </label>
+                  <label>Industry
+                    <select
+                      className="enroll-select-wide"
+                      value={formData.industry}
+                      onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                    >
+                      <option>Education</option>
+                      <option>Healthcare</option>
+                      <option>Airports</option>
+                      <option>Government</option>
+                      <option>Manufacturing</option>
+                      <option>Stadiums</option>
+                      <option>Other</option>
+                    </select>
+                  </label>
+                  {formStatus === 'error' && (
+                    <div className="form-error">Something went wrong. Please try again.</div>
+                  )}
+                  <button className="primary-button" type="submit" disabled={formStatus === 'submitting'}>
+                    {formStatus === 'submitting' ? 'Submitting...' : 'Request a demo'}
+                    {formStatus !== 'submitting' && <ArrowRight size={16} />}
+                  </button>
+                </form>
+                <small>By submitting, you agree to be contacted by Bimeon.</small>
+              </>
+            )}
           </div>
         </div>
       )}
