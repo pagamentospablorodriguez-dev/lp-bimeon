@@ -563,6 +563,38 @@ img { display: block; max-width: 100%; }
 .roadmap-card h3 { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
 .roadmap-card p { font-size: 13px; color: var(--text-2); margin: 0; line-height: 1.55; }
 
+/* ========== LANGUAGE SWITCHER ========== */
+.language-switcher { position: relative; }
+.language-trigger {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 12px; font-size: 13px; font-weight: 500; color: var(--text-2);
+  border: 1px solid var(--line); border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.25s ease;
+}
+.language-trigger:hover { color: var(--text); border-color: var(--line-strong); background: rgba(255, 255, 255, 0.04); }
+.language-chevron { transition: transform 0.25s ease; }
+.language-chevron.open { transform: rotate(180deg); }
+.language-menu {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 110;
+  min-width: 180px; padding: 6px;
+  background: rgba(13, 15, 20, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  display: flex; flex-direction: column; gap: 2px;
+  animation: langMenuIn 0.2s ease;
+}
+@keyframes langMenuIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.language-option {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  border-radius: 8px; transition: all 0.2s ease; text-align: left;
+}
+.language-option:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+.language-option.active { color: var(--accent); background: rgba(74, 158, 255, 0.08); }
+.language-option span:first-child { font-size: 16px; }
+.language-option svg { margin-left: auto; }
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1100px) {
   .hero-content h1 { font-size: 48px; }
@@ -611,4 +643,5 @@ img { display: block; max-width: 100%; }
   .recognition-view { grid-template-columns: 1fr; }
   .enroll-view { grid-template-columns: 1fr; }
   .final-cta { min-height: 480px; }
+  .language-trigger span { display: none; }
 }
