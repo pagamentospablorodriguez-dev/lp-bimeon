@@ -445,6 +445,18 @@ img { display: block; max-width: 100%; }
 .demo-modal form .primary-button { margin-top: 4px; }
 .demo-modal small { display: block; margin-top: 20px; font-size: 12px; color: var(--text-3); text-align: center; }
 
+/* Success state */
+.demo-success { text-align: center; padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.success-icon { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 50%; background: rgba(56, 214, 200, 0.1); color: var(--accent-2); border: 1px solid rgba(56, 214, 200, 0.25); animation: successPop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes successPop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+.demo-success h2 { margin: 0; font-size: 26px; }
+.demo-success p { font-size: 15px; color: var(--text-2); margin: 0 0 8px; max-width: 340px; }
+.demo-success .primary-button { margin-top: 8px; }
+
+/* Form error */
+.form-error { padding: 10px 14px; font-size: 13px; color: var(--critical); background: rgba(255, 90, 82, 0.08); border: 1px solid rgba(255, 90, 82, 0.2); border-radius: 8px; }
+.demo-modal form .primary-button:disabled { opacity: 0.6; cursor: default; }
+
 /* ========== BEFORE / AFTER COMPARISON ========== */
 .comparison-section { background: var(--bg); }
 .comparison-heading { margin-bottom: 48px; }
